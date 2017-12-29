@@ -21,7 +21,9 @@ void setup() {
   gui.addButton("colorA").setSize(40, 40).setPosition(30, 30);
   gui.addButton("colorB").setSize(40, 40).setPosition(400, 30);
   gui.addCanvas(contentsA = new Contents(50, 60, window3d));
-  gui.addCanvas(contentsB = new Contents(400, 60, window3d));
+  gui.addCanvas(contentsB = new Contents(400, 60, window3d).setLockRotation(true));
+  gui.addLabel("Free Camera").setPosition(160, 70);
+  gui.addLabel("Pan/Zoom Camera").setPosition(510, 70);
   gui.addFrameRate();
 }
 
@@ -60,6 +62,7 @@ class Contents extends controlP5.Canvas {
   CameraState camState;
   boolean updateCamera = true;
   boolean holdCamera = false;
+  boolean lockRotation = false;
 
   public Contents(int x, int y, PGraphics graphic) {
     //this.name = name;
@@ -94,6 +97,11 @@ class Contents extends controlP5.Canvas {
 
   void manageActiveWindow() {
     if (isMouseOver() || updateCamera) {
+      if(lockRotation) {
+         cam.setLeftDragHandler(cam.getPanDragHandler());
+      }else{
+        cam.setLeftDragHandler(cam.getRotateDragHandler());
+      }
       if (holdCamera) {
         holdCamera = false;
         setCamera();
@@ -117,8 +125,14 @@ class Contents extends controlP5.Canvas {
     updateCameraMatrix();
   }
 
-  void setCubeColor(int c) {
+  Contents setCubeColor(int c) {
     cubeColor = c;
+    return this;
+  }
+  
+  Contents setLockRotation(boolean b){
+    lockRotation = b;
+    return this;
   }
 
   boolean isMouseOver() {
